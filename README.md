@@ -6,7 +6,7 @@
 # and place it inside the project (pytorch file: conceptual_weights.pt)
 # 3) As well as install openpyxl by using command:  pip install openpyxl
 # and 	pip install protobuf  
-
+# 4) pip install rouge_score
 ## !ATTENTION! ##
 
 * Default value for readFromDataset variable (in main.py) is -1 or any negative integer number.
