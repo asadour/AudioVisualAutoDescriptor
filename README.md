@@ -17,8 +17,7 @@ Used python 3.10
 Upon starting the execution of the code we test the CLIP as following:
   !!TEST CLIP:!! a chimpanzee with a finger in its mouth.
 
-![monkey](https://github.com/asadour/AudioVisualAutoDescriptor/assets/22840678/6834c46c-9f08-4fe0-82e3-3bcd2190bc7e)
-
+![monkey](https://github.com/asadour/AudioVisualAutoDescriptor/assets/22840678/0303167f-6421-4518-b14a-e8143a837927)
 
 
 That's it...
