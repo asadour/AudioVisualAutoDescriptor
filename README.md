@@ -6,6 +6,11 @@
 # and place it inside the project (pytorch file: conceptual_weights.pt)
 # 3) As well as install openpyxl by using command:  pip install openpyxl
 
+## !ATTENTION! ##
+
+* Default value for readFromDataset variable (in main.py) is -1 or any negative integer number.
+* Default value for numOfPerGroup variable (in main.py) is 500.
+
 Used python 3.10
 
 
