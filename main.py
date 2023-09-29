@@ -141,7 +141,7 @@ def sampleMovieClip(videoPath):
             # every 10
             samplePath = 'Samples\\' + str(uuid.uuid4()) + '.png'
             frame_images.append(samplePath)
-            cv2.imread('TestImages\\bat.png')
+            cv2.imread('TestImages\\monkey.png')
             cv2.imwrite(samplePath, frame)
         counter += 1
 
@@ -271,7 +271,7 @@ import xlsxwriter
 def createExcelWithResults(excelName, givenDescriptionsList, generatedDescriptionsList, videoNamesList, videoPathsList,
                            paraphrasedDescriptionsList):
     row = 1
-
+    print(givenDescriptionsList)
     workbook = xlsxwriter.Workbook(excelName)
     worksheet = workbook.add_worksheet()
     listLen = range(len(givenDescriptionsList))
@@ -306,7 +306,8 @@ def createExcelWithResults(excelName, givenDescriptionsList, generatedDescriptio
 def prepareDataset(datasetName, numRows, newDSName, perGroup):
     exists = os.path.isdir(DatasetConstants.videosDatasetPath)
     if not exists:
-        print("Source folder does not exist! Try to declare a valid source path! \n Consider \"videosDatasetPath\" variable in DatasetConstants python file!")
+        print(
+            "Source folder does not exist! Try to declare a valid source path! \n Consider \"videosDatasetPath\" variable in DatasetConstants python file!")
         exit(0)
     ds = Dataset(datasetName)
     dataSetList = ds.readDataset(numRows)
@@ -361,19 +362,21 @@ def CombineResultsMultiProcesses(excelRanges):
 
     for r in runExcels:
         excl_list = []
+        allCSVs = []
 
         for file in r:
-            fileName = excelNames[counterName] + str(file) + ".xlsx"
             fileCSV = excelNames[counterName] + str(file) + ".csv"
-            if os.path.exists(fileName):
+            if os.path.exists(fileCSV):
                 excl_list.append(pd.read_csv(fileCSV, header=None))
-                os.unlink(fileName)
-
+                allCSVs.append(fileCSV)
         excl_merged = pd.concat(excl_list, ignore_index=True)
         excl_merged.to_csv(excelFinalNames[counterName] + ".csv", index=False, chunksize=100000)
         CSVToExcel(excelFinalNames[counterName] + ".csv")
-        if os.path.isfile(excelFinalNames[counterName] + ".csv"):
-            os.remove(excelFinalNames[counterName] + ".csv")
+        for csvs in allCSVs:
+            if os.path.isfile(csvs):
+                os.remove(csvs)
+            if os.path.isfile(str(csvs).replace("csv", "xlsx")):
+                os.remove(str(csvs).replace("csv", "xlsx"))
         counterName += 1
 
 
@@ -428,12 +431,13 @@ def initCLIP():
     global model, clip_model, preprocess, tokenizer
     model, clip_model, preprocess, tokenizer = setMainModels()
 
+
 def runChatGPT():
     from chatGPTFeed import chatGPTSummary as chatgptsum
     dataset = pd.read_csv("TrainMerged.csv", header=0, sep=",")[:50]
-    import  time
+    import time
     for vals in dataset["input"].values:
-        print(chatgptsum(vals).result + "***"+vals+"\n")
+        print(chatgptsum(vals).result + "***" + vals + "\n")
         time.sleep(25)
 
 
@@ -446,19 +450,17 @@ if __name__ == "__main__":
     # NNforImages("rabbit_owl.png")
     # test finished
 
-
-    readFromDataset = 30  # if value >= 0 then reads only first N rows else reads everything inside the dataset
-    numOfPerGroup = 5  # group value for each process during the multi-processing
+    readFromDataset = 70  # if value >= 0 then reads only first N rows else reads everything inside the dataset - default value = -1
+    numOfPerGroup = 10  # group value for each process during the multi-processing - default value = 500
     if 0 <= readFromDataset < numOfPerGroup:
         print("Must be readFromDataset >= numOfPerGroup")
         exit(0)
     else:
         noFiles = 0
-        if (readFromDataset / numOfPerGroup == int(readFromDataset / numOfPerGroup)):
+        if readFromDataset / numOfPerGroup == int(readFromDataset / numOfPerGroup):
             noFiles = int(readFromDataset / numOfPerGroup)
         else:
             noFiles = int(readFromDataset / numOfPerGroup) + 1
-
 
         prepareDatasetStep(dconst.test_csv, readFromDataset, dconst.dsExcelTest, numOfPerGroup)
         prepareDatasetStep(dconst.train_csv, readFromDataset, dconst.dsExcelTrain, numOfPerGroup)
@@ -493,17 +495,12 @@ if __name__ == "__main__":
     ftBART("BARTCLIP", ["TrainMerged.csv", "ValidationMerged.csv", "TestMerged.csv"])
     # trained with clip text as input
 
-
     runChatGPT()
-
-
 
     from MetricsFromModels import getRougeFromModels
     from MetricsFromModels import getRougeFromModelPegasus
-    getRougeFromModelPegasus("TestMerged.csv", -1, ";")
-    getRougeFromModelPegasus("TestMergedWithSummary.csv", -1, ";")
-    print(getRougeFromModels("TestMerged.csv", -1, ";", "facebook/bart-large", "bart").result)
-    print(getRougeFromModels("TestMergedWithSummary.csv", -1, ";", "facebook/bart-large", "bart").result)
 
-
-
+    getRougeFromModelPegasus("TestMerged.csv", -1, ",")
+    getRougeFromModelPegasus("TestMergedWithSummary.csv", -1, ",")
+    print(getRougeFromModels("TestMerged.csv", -1, ",", "facebook/bart-large", "bart").result)
+    print(getRougeFromModels("TestMergedWithSummary.csv", -1, ",", "facebook/bart-large", "bart").result)
