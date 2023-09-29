@@ -54,7 +54,7 @@ class FineTunePegasus:
 
         self.rouge_score = evaluate.load("rouge")
 
-        batch_size = 1 # 64
+        batch_size = 64  # 64
         num_train_epochs = 1
 
         # Show the training loss with every epoch
@@ -62,7 +62,7 @@ class FineTunePegasus:
         model_name = model_checkpoint.split("/")[-1]
 
         args = Seq2SeqTrainingArguments(
-            output_dir=f"{model_name}-"+folderName,
+            output_dir=f"{model_name}-" + folderName,
             evaluation_strategy="steps",
             learning_rate=3.0e-5,
             per_device_train_batch_size=batch_size,
@@ -108,7 +108,6 @@ class FineTunePegasus:
             print(f"\n'>> Summary: {example['target']}'")
             print(f"'>> Document: {example['input']}'")
 
-
     def preprocess_function(self, examples):
         model_inputs = tokenizer(examples["input"], max_length=max_input_length, truncation=True, )
         labels = tokenizer(examples["target"], max_length=128, truncation=True)
@@ -144,6 +143,3 @@ class FineTunePegasus:
         print(result)
         print(bleu_results)
         return rouge_dict
-
-
-

@@ -51,8 +51,7 @@ class FineTuneBART:
 
         print(tokenized_dataset)
 
-
-        batch_size = 1 #16
+        batch_size = 16  # 16
         num_train_epochs = 2
 
         # Show the training loss with every epoch
@@ -60,7 +59,7 @@ class FineTuneBART:
         model_name = model_checkpoint.split("/")[-1]
 
         args = Seq2SeqTrainingArguments(
-            output_dir=f"{model_name}-"+folderName,
+            output_dir=f"{model_name}-" + folderName,
             evaluation_strategy="steps",
             learning_rate=2.0e-5,
             per_device_train_batch_size=batch_size,
@@ -113,7 +112,6 @@ class FineTuneBART:
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
 
-
     def compute_metrics(self, eval_pred):
         predictions, labels = eval_pred
         from rouge_score import rouge_scorer
@@ -143,5 +141,3 @@ class FineTuneBART:
         print(result)
         print(bleu_results)
         return rouge_dict
-
-
